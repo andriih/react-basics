@@ -6,12 +6,16 @@ import Header from './components/Header'
 import Todo from './components/Todo'
 import Form from './components/Form'
 
+import fetch from 'isomorphic-fetch'
+import 'es6-promise'
+import axios from 'axios'
+
 class App extends React.Component {
 	constructor(props) {
 		super(props)
 		
 			this.state = {
-				todos : this.props.initialData
+				todos : []
 			}
 
 			this.handleStatusChange = this.handleStatusChange.bind(this)
@@ -20,10 +24,13 @@ class App extends React.Component {
 			this.handleEdit = this.handleEdit.bind(this)
 		}
 
-		nextId() {
-			this._nextId = this._nextId || 4
-			return this._nextId++
+		componentDidMount() {
+			axios.get('/api/todos')
+				.then(response => response.data)
+				.then(todos => this.setState({ todos }))
+				.catch(this.handleError)
 		}
+
 
 		handleStatusChange(id){
 			let todos = this.state.todos.map(todo => {
@@ -38,15 +45,14 @@ class App extends React.Component {
 		}
 
 		handleAdd(title){
-			let todo = {
-				id: this.nextId(),
-				title : title,
-				completed: false
-			}
-
-			let todos = [...this.state.todos, todo]
-
-			this.setState({ todos })
+			axios.post('/api/todos', { title })
+					.then(response => response.data)
+					.then(todo => {
+						const todos = [...this.state.todos, todo]
+						
+						this.setState({ todos })
+					})
+					.catch( this.handleError )
 		}
 
 		handleDelete(id){
@@ -64,6 +70,10 @@ class App extends React.Component {
 			})
 
 			this.setState({ todos })
+		}
+
+		handleError(error){
+			console.error(error)
 		}
 
 		render() {

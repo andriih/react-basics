@@ -7,8 +7,13 @@
     "build": "webpack -p"
   },
   "dependencies": {
+    "axios": "^0.16.2",
+    "es6-promise": "^4.1.1",
+    "fetch": "^1.1.0",
+    "isomorphic-fetch": "^2.2.1",
     "react": "15.4.2",
-    "react-dom": "15.4.2"
+    "react-dom": "15.4.2",
+    "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "babel-core": "6.23.1",
