@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import ReactCSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
 
 import todos from './todos'
 import Header from './components/Header'
@@ -45,7 +46,7 @@ class App extends React.Component {
 
 		handleDelete(id){
 			axios.delete(`/api/todos/${id}`)
-				.them(()=> {
+				.then(()=> {
 					
 					const todos = this.state.todos.filter(todo=>todo.id !== id)
 					
@@ -88,7 +89,7 @@ class App extends React.Component {
 			.catch(this.handleError)
 
 			
-		}
+		} 
 
 		handleError(error){
 			console.error(error)
@@ -100,7 +101,15 @@ class App extends React.Component {
 					
 					<Header  title={this.props.title} todos={this.state.todos} />
 
-					<section className="todo-list">
+					<ReactCSSTransitionGroup  
+						className="todo-list"
+						component="section"
+						transitionName="slide"
+						transitionAppear={true}
+						transitionAppearTimeout={500}
+          				transitionEnterTimeout={500}
+         				transitionLeaveTimeout={500}>
+						
 						{this.state.todos.map(todo => 
 							<Todo 
 								key={todo.id}
@@ -111,8 +120,9 @@ class App extends React.Component {
 								onStatusChange={this.handleToggle}
 								onDelete={this.handleDelete}
 								onEdit={this.handleEdit}/>)
-						}	
-					</section>
+						}
+
+					</ReactCSSTransitionGroup>
 					<Form onAdd={this.handleAdd}/>
 				</main>
 			)
