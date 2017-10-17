@@ -17,11 +17,12 @@ class App extends React.Component {
 			this.state = {
 				todos : []
 			}
-
-			this.handleStatusChange = this.handleStatusChange.bind(this)
+			
 			this.handleDelete = this.handleDelete.bind(this)
 			this.handleAdd = this.handleAdd.bind(this)
 			this.handleEdit = this.handleEdit.bind(this)
+			this.handleToggle =  this.handleToggle.bind(this)
+			this.handleError = this.handleError.bind(this)
 		}
 
 		componentDidMount() {
@@ -31,21 +32,8 @@ class App extends React.Component {
 				.catch(this.handleError)
 		}
 
-
-		handleStatusChange(id){
-			let todos = this.state.todos.map(todo => {
-				if(todo.id === id){
-					todo.completed = !todo.completed
-				}
-
-				return todo
-			})
-
-			this.setState({ todos })
-		}
-
 		handleAdd(title){
-			axios.post('/api/todos', { title })
+			axios.post('/api/todos', { title: title })
 					.then(response => response.data)
 					.then(todo => {
 						const todos = [...this.state.todos, todo]
@@ -56,8 +44,31 @@ class App extends React.Component {
 		}
 
 		handleDelete(id){
-			let todos = this.state.todos.filter(todo=>todo.id !== id)
-			this.setState({todos})
+			axios.delete(`/api/todos/${id}`)
+				.them(()=> {
+					
+					const todos = this.state.todos.filter(todo=>todo.id !== id)
+					
+					this.setState({todos})
+				})
+				.catch( this.handleError )
+			
+		}
+
+		handleToggle( id ){
+			axios.patch(`/api/todos/${id}`)
+				.then(response => {
+					const todos = this.state.todos.map(todo =>{
+						if(todo.id === id){
+							todo = response.data
+						}
+
+						return todo
+					})
+
+					this.setState({ todos })
+				})
+					.catch(this.handleError)
 		}
 
 		handleEdit(id,title){
@@ -90,7 +101,7 @@ class App extends React.Component {
 								title={todo.title} 
 								completed={todo.completed} 
 								key={todo.id} 
-								onStatusChange={this.handleStatusChange}
+								onStatusChange={this.handleToggle}
 								onDelete={this.handleDelete}
 								onEdit={this.handleEdit}/>)
 						}	
