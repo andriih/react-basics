@@ -72,15 +72,22 @@ class App extends React.Component {
 		}
 
 		handleEdit(id,title){
-			let todos = this.state.todos.map(todo => {
-				if(todo.id === id){
-					todo.title = title
-				}
 
-				return todo
+			axios.put(`/api/todos/${id}`, {title:title})
+					.then(response => {
+					const todos = this.state.todos.map(todo => {
+						if(todo.id === id){
+							todo = response.data
+						}
+
+						return todo
+					})
+
+					this.setState({ todos })
 			})
+			.catch(this.handleError)
 
-			this.setState({ todos })
+			
 		}
 
 		handleError(error){
